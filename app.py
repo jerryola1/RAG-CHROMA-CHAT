@@ -265,9 +265,7 @@ from langchain_openai import ChatOpenAI
 
 # URLs to scrape (replace with the desired pages from the University of Hull website)
 urls = [
-    "https://www.hull.ac.uk",
-    "https://www.hull.ac.uk/study",
-    "https://www.hull.ac.uk/research",
+    "https://www.hull.ac.uk/study/webinars.aspx",
     # Add more URLs as needed
 ]
 
@@ -318,4 +316,4 @@ docs = loader.load()
 
 html2text = Html2TextTransformer()
 docs_transformed = html2text.transform_documents(docs)
-print(docs_transformed[0].page_content[0:500])
+print(docs_transformed[0].page_content)
