@@ -242,16 +242,80 @@ def rag(chunks, collection_name):
 ###############################################################################################################
 
 
+# from langchain_community.document_loaders import AsyncChromiumLoader
+# from langchain_community.document_transformers import BeautifulSoupTransformer
+
+# # Load HTML
+# loader = AsyncChromiumLoader(["https://www.beyond-events.co.uk/"])
+# html = loader.load()
+
+# # Transform
+# bs_transformer = BeautifulSoupTransformer()
+# docs_transformed = bs_transformer.transform_documents(html, tags_to_extract=["span"])
+
+# # Result
+# print(docs_transformed[0].page_content[0:500])
+
+
 from langchain_community.document_loaders import AsyncChromiumLoader
 from langchain_community.document_transformers import BeautifulSoupTransformer
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.chains import create_extraction_chain
+from langchain_openai import ChatOpenAI
 
-# Load HTML
-loader = AsyncChromiumLoader(["https://www.beyond-events.co.uk/"])
-html = loader.load()
+# URLs to scrape (replace with the desired pages from the University of Hull website)
+urls = [
+    "https://www.hull.ac.uk",
+    "https://www.hull.ac.uk/study",
+    "https://www.hull.ac.uk/research",
+    # Add more URLs as needed
+]
 
-# Transform
-bs_transformer = BeautifulSoupTransformer()
-docs_transformed = bs_transformer.transform_documents(html, tags_to_extract=["span"])
+# Load HTML using AsyncChromiumLoader
+# loader = AsyncChromiumLoader(urls)
+# docs = loader.load()
 
-# Result
+# # Transform HTML using BeautifulSoupTransformer
+# bs_transformer = BeautifulSoupTransformer()
+# docs_transformed = bs_transformer.transform_documents(docs, tags_to_extract=["p", "text-h2", "h2", "h3", "span", "text-h1"])
+
+# # Split the text into chunks
+# splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=1000, chunk_overlap=0)
+# splits = splitter.split_documents(docs_transformed)
+
+# # Define schema for extraction
+# schema = {
+#     "properties": {
+#         "title": {"type": "string"},
+#         "content": {"type": "string"},
+#     },
+#     "required": ["title", "content"],
+# }
+
+# Initialize LLM
+# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0613")
+
+# Create extraction chain
+# extraction_chain = create_extraction_chain(schema=schema, llm=llm)
+
+# Extract relevant information from the scraped data
+# extracted_data = []
+# for split in splits:
+#     # extracted = extraction_chain.invoke(split.page_content)
+#     extracted_data.append(extracted)
+
+# # Print the extracted data
+# for data in extracted_data:
+#     print("Title:", data.get("title"))
+#     print("Content:", data.get("content"))
+#     print("---")
+
+from langchain_community.document_loaders import AsyncHtmlLoader
+from langchain_community.document_transformers import Html2TextTransformer
+
+loader = AsyncHtmlLoader(urls)
+docs = loader.load()
+
+html2text = Html2TextTransformer()
+docs_transformed = html2text.transform_documents(docs)
 print(docs_transformed[0].page_content[0:500])
